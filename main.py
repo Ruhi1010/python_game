@@ -136,11 +136,11 @@ class Main:
     def render_ship(self):
         if self.moving_right == True:
             self.ship.ship_rect.x += self.settings.ship_speed
-        elif self.moving_left == True:
+        if self.moving_left == True:
             self.ship.ship_rect.x -= self.settings.ship_speed
-        elif self.moving_up == True:
+        if self.moving_up == True:
             self.ship.ship_rect.y -= self.settings.ship_speed
-        elif self.moving_down == True:
+        if self.moving_down == True:
             self.ship.ship_rect.y += self.settings.ship_speed
 
     
