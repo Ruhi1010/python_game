@@ -1,6 +1,9 @@
 import pygame
 from settings import Settings
 from ship import Ship
+from math import floor,ceil
+from sys import exit
+from bullet import Bullet
 
 
 class Main:
@@ -11,20 +14,12 @@ class Main:
         pygame.init()
         self.settings = Settings()
 
-        self.screen = pygame.display.set_mode(size=(
-            self.settings.width,
-            self.settings.height
-        ))
+        self.screen = pygame.display.set_mode(size=(self.settings.width, self.settings.height))
         pygame.display.set_caption('Alien Invasion')
 
         self.ship = Ship(self.screen)
-        
-        
-        #movement flags 
-        self.moving_right = False
-        self.moving_left = False
-        self.moving_up = False
-        self.moving_down = False
+        self.bullets = pygame.sprite.Group()
+
 
         #talk about this later
         self.clock = pygame.time.Clock()
@@ -32,63 +27,73 @@ class Main:
         self.font = pygame.font.SysFont("Arial", 24)
 
     def run_game(self):
-        x=100
-        y = 100
         while True:
             self.check_events()
             self.render()
+            self.ship.update()
+            self.bullets.update()
+            for bullet in self.bullets.copy():
+                if bullet.rect.top <= 50:
+                    self.bullets.remove(bullet)
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return
+                exit()
             
             #flagging
-            elif event.type == pygame.KEYDOWN: 
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    exit()
                 if event.key == pygame.K_RIGHT:
-                    self.moving_right = True
+                    self.ship.moving_right = True
+
                 elif event.key == pygame.K_LEFT:
-                    self.moving_left = True
+                    self.ship.moving_left = True
+
                 elif event.key == pygame.K_UP:
-                    self.moving_up = True
+                    self.ship.moving_up = True
+
                 elif event.key == pygame.K_DOWN:
-                    self.moving_down = True
-            
+                    self.ship.moving_down = True
+                elif event.key == pygame.K_SPACE:
+                    self.create_bullet()
+
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
-                    self.moving_right = False
+                    self.ship.moving_right = False
+
                 elif event.key == pygame.K_LEFT:
-                    self.moving_left = False
+                    self.ship.moving_left = False
+
                 elif event.key == pygame.K_UP:
-                    self.moving_up = False
+                    self.ship.moving_up = False
+
                 elif event.key == pygame.K_DOWN:
-                    self.moving_down = False
+                    self.ship.moving_down = False
+    
+    def create_bullet(self):
+        new_bullet = Bullet(self)
+        self.bullets.add(new_bullet)
             
-    def render(self):            
+
+
+    def render(self):
         self.screen.fill(self.settings.bg_color) #this is the backaground
         self.render_fps(self.screen, self.clock, self.font)
-        self.render_ship()
-
-
         self.ship.blitme()
-
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+        
 
         pygame.display.flip()
 
 
-            #talk about this later
+        #talk about this later
         self.clock.tick()
-    
-    
-    def render_ship(self):
-        if self.moving_right == True:
-            self.ship.ship_rect.x += self.settings.ship_speed
-        if self.moving_left == True:
-            self.ship.ship_rect.x -= self.settings.ship_speed
-        if self.moving_up == True:
-            self.ship.ship_rect.y -= self.settings.ship_speed
-        if self.moving_down == True:
-            self.ship.ship_rect.y += self.settings.ship_speed
+
 
     
     #talk about this later
